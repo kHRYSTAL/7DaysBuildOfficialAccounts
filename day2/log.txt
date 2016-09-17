@@ -1,0 +1,119 @@
+192:wechat kHRYSTAL$ node --harmony app.js
+Listening :1234
+getAccessToken{"access_token":"vrf7tTzDcqKIYM1Ve9tkvDL2xU3_j1n2u00cSLMCKpTDZbuvs6Rc8_fWdirKUPgXSEh61BDS7BiQGGMnlnVieZ0gdZZ7RfwknQddNJVqjpV-KJxxxelVUHTXeagvQ22kSJOaACAGXC","expires_in":1474111241022}
+{ signature: '8423ff3bd2c4c4cb78eea6212e53c17e0a3f0bda',
+  timestamp: '1474104635',
+  nonce: '1893317622',
+  openid: 'onlqLxKYRrMQ4bgaKOmZ1EZEEtZs' }
+<xml><ToUserName><![CDATA[gh_2e31c709a288]]></ToUserName>
+<FromUserName><![CDATA[onlqLxKYRrMQ4bgaKOmZ1EZEEtZs]]></FromUserName>
+<CreateTime>1474104635</CreateTime>
+<MsgType><![CDATA[event]]></MsgType>
+<Event><![CDATA[subscribe]]></Event>
+<EventKey><![CDATA[]]></EventKey>
+</xml>
+{ signature: 'e52ba49ff11b834bf884154e905460149db9b531',
+  timestamp: '1474105481',
+  nonce: '929127775',
+  openid: 'onlqLxKYRrMQ4bgaKOmZ1EZEEtZs' }
+<xml><ToUserName><![CDATA[gh_2e31c709a288]]></ToUserName>
+<FromUserName><![CDATA[onlqLxKYRrMQ4bgaKOmZ1EZEEtZs]]></FromUserName>
+<CreateTime>1474105481</CreateTime>
+<MsgType><![CDATA[text]]></MsgType>
+<Content><![CDATA[1]]></Content>
+<MsgId>6331234832169700013</MsgId>
+</xml>
+{ signature: '0fa441cfb20be593e441901bf252ebe566962025',
+  timestamp: '1474105508',
+  nonce: '1674319306',
+  openid: 'onlqLxKYRrMQ4bgaKOmZ1EZEEtZs' }
+<xml><ToUserName><![CDATA[gh_2e31c709a288]]></ToUserName>
+<FromUserName><![CDATA[onlqLxKYRrMQ4bgaKOmZ1EZEEtZs]]></FromUserName>
+<CreateTime>1474105507</CreateTime>
+<MsgType><![CDATA[location]]></MsgType>
+<Location_X>39.087330</Location_X>
+<Location_Y>117.148514</Location_Y>
+<Scale>16</Scale>
+<Label><![CDATA[南开区观园公寓西(近红旗南路)]]></Label>
+<MsgId>6331234943838849715</MsgId>
+</xml>
+^C
+192:wechat kHRYSTAL$ npm install xml2js
+xml2js@0.4.17 node_modules/xml2js
+├── sax@1.2.1
+└── xmlbuilder@4.2.1 (lodash@4.15.0)
+192:wechat kHRYSTAL$ node --harmony app.js
+Listening :1234
+
+  ReferenceError: util is not defined
+      at Object.<anonymous> (/Users/kHRYSTAL/nodeprojects/day2/wechat/wechat/g.js:52:27)
+      at GeneratorFunctionPrototype.next (native)
+      at Object.<anonymous> (/Users/kHRYSTAL/nodeprojects/day2/wechat/node_modules/koa/node_modules/koa-compose/index.js:28:19)
+      at GeneratorFunctionPrototype.next (native)
+      at onFulfilled (/Users/kHRYSTAL/nodeprojects/day2/wechat/node_modules/koa/node_modules/co/index.js:65:19)
+      at runMicrotasksCallback (node.js:337:7)
+      at process._tickCallback (node.js:355:11)
+
+^C
+192:wechat kHRYSTAL$ node --harmony app.js
+Listening :1234
+
+  TypeError: undefined is not a function
+      at Object.<anonymous> (/Users/kHRYSTAL/nodeprojects/day2/wechat/wechat/g.js:53:32)
+      at GeneratorFunctionPrototype.next (native)
+      at Object.<anonymous> (/Users/kHRYSTAL/nodeprojects/day2/wechat/node_modules/koa/node_modules/koa-compose/index.js:28:19)
+      at GeneratorFunctionPrototype.next (native)
+      at onFulfilled (/Users/kHRYSTAL/nodeprojects/day2/wechat/node_modules/koa/node_modules/co/index.js:65:19)
+      at runMicrotasksCallback (node.js:337:7)
+      at process._tickCallback (node.js:355:11)
+
+^C
+192:wechat kHRYSTAL$ node --harmony app.js
+Listening :1234
+{ xml:
+   { ToUserName: [ 'gh_2e31c709a288' ],
+     FromUserName: [ 'onlqLxKYRrMQ4bgaKOmZ1EZEEtZs' ],
+     CreateTime: [ '1474107221' ],
+     MsgType: [ 'text' ],
+     Content: [ '啊' ],
+     MsgId: [ '6331242305412795471' ] } }
+{ xml:
+   { ToUserName: [ 'gh_2e31c709a288' ],
+     FromUserName: [ 'onlqLxKYRrMQ4bgaKOmZ1EZEEtZs' ],
+     CreateTime: [ '1474107238' ],
+     MsgType: [ 'voice' ],
+     MediaId: [ 'PnJfsCBs6Y7Ks030SM96LW0GW8FySipVp-rBbMHJzyktL660JnLr6Qvvx6VoAjue' ],
+     Format: [ 'amr' ],
+     MsgId: [ '6331242378427239513' ],
+     Recognition: [ '' ] } }
+{ xml:
+   { ToUserName: [ 'gh_2e31c709a288' ],
+     FromUserName: [ 'onlqLxKYRrMQ4bgaKOmZ1EZEEtZs' ],
+     CreateTime: [ '1474107309' ],
+     MsgType: [ 'event' ],
+     Event: [ 'unsubscribe' ],
+     EventKey: [ '' ] } }
+{ xml:
+   { ToUserName: [ 'gh_2e31c709a288' ],
+     FromUserName: [ 'onlqLxKYRrMQ4bgaKOmZ1EZEEtZs' ],
+     CreateTime: [ '1474107327' ],
+     MsgType: [ 'event' ],
+     Event: [ 'subscribe' ],
+     EventKey: [ '' ] } }
+
+     ^C
+     192:wechat kHRYSTAL$ node --harmony app.js
+     Listening :1234
+     { xml:
+        { ToUserName: [ 'gh_2e31c709a288' ],
+          FromUserName: [ 'onlqLxKYRrMQ4bgaKOmZ1EZEEtZs' ],
+          CreateTime: [ '1474109037' ],
+          MsgType: [ 'text' ],
+          Content: [ '55555' ],
+          MsgId: [ '6331250105073405436' ] } }
+     { ToUserName: 'gh_2e31c709a288',
+       FromUserName: 'onlqLxKYRrMQ4bgaKOmZ1EZEEtZs',
+       CreateTime: '1474109037',
+       MsgType: 'text',
+       Content: '55555',
+       MsgId: '6331250105073405436' }     
