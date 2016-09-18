@@ -1,8 +1,6 @@
 // generator, this file is a middleware
 'use strict'
 
-// 加密模块
-var sha1 = require('sha1')
 var Wechat = require('./wechat')
 var getRawBody = require('raw-body')
 var util = require('./util')
@@ -41,8 +39,7 @@ module.exports = function(opts) {
         return false
       }
 // 需要yield关键字 因为raw-body模块是一个生成器 不能直接获取数据
-// yield 方便于协程、同步调用防止耗时等操作
-// 如果有消息，就把消息取出。在执行耗时操作较长时 把主线程交给其他函数调用
+// yield 用于类似协程操作 异步变同步 kao调用generator对象next() 等待执行完成
       var data = yield getRawBody(this.req, {
         length: this.length,
         limit: '1mb',

@@ -33,6 +33,8 @@ var config = {
 var app = new Koa()
 
 // function * mean generator
+// 内部包含 yield 在koa中会最终使用co & promise
+// 用同步代码实现异步操作
 app.use(wechat(config.wechat))
 
 app.listen(1234)
