@@ -4,9 +4,10 @@
 var Wechat = require('./wechat')
 var getRawBody = require('raw-body')
 var util = require('./util')
+var sha1 = require('sha1')
 
 
-module.exports = function(opts) {
+module.exports = function(opts, handler) {
   var wechat = new Wechat(opts)
 
   return function *(next) {
@@ -73,7 +74,8 @@ module.exports = function(opts) {
 
 // this 指向当前上下文
       this.weixin = message
-// this 获取handler方法 next函数为传入handler的参数 yield是因为异步操作需要同步
+// this 获取handler方法 next函数为传入handler的参数
+// handler 是一个生成器 ../weixin.js 需要用yield关键字加入koa栈中
       yield handler.call(this, next)
 //调用 Wechat中的reply方法
       wechat.reply.call(this)

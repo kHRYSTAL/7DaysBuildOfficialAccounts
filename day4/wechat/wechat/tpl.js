@@ -4,40 +4,53 @@
 var ejs = require('ejs')
 var heredoc = require('heredoc')
 
-var tpl = heredoc(function() {/*
-  <xml>
-  <ToUserName><![CDATA[<% toUserName %>]]></ToUserName>
-  <FromUserName><![CDATA[<% fromUserName %>]]></FromUserName>
-  <CreateTime><% createTime %></CreateTime>
-  <MsgType><![CDATA[<% msgType %>]]></MsgType>
-  <% if (msgType === 'text') { %>
-      <Content><![CDATA[<% content %>]]></Content>
-  <% } else if (msgType === 'image') { %>
-      <PicUrl><![CDATA[content.picUrl]]></PicUrl>
-      <MediaId><![CDATA[<% content.media_id %>]]></MediaId>
-  <% } else if (msgType === 'voice') {%>
-      <Format><![CDATA[<% content.format %>]]></Format>
-      <MediaId><![CDATA[<% content.media_id %>]]></MediaId>
-      <Recognition><![CDATA[<% content.recognition %>]]></Recognition>
-  <% } else if (msgType === video) { %>
-      <MediaId><![CDATA[content.media_id]]></MediaId>
-      <ThumbMediaId><![CDATA[content.thumb_media_id]]></ThumbMediaId>
-  <% } else if (msgType === shortvideo) { %>
-      <MediaId><![CDATA[content.media_id]]></MediaId>
-      <ThumbMediaId><![CDATA[content.thumb_media_id]]></ThumbMediaId>
-  <% } else if (msgType === location) { %>
-      <Location_X><% content.location_x %></Location_X>
-      <Location_Y><% content.location_y %></Location_Y>
-      <Scale><% content.location_scale %></Scale>
-      <Label><![CDATA[<% content.location %>]]></Label>
-  <% } else if (msgType === link) { %>
-      <Title><![CDATA[<% content.title %>]]></Title>
-      <Description><![CDATA[<% content.description %>]]></Description>
-      <Url><![CDATA[<% content.url %>]]></Url>
-  <% } %>
-  <MsgId><% msgId %></MsgId>
-  </xml>
-*/})
+var tpl = heredoc(function() {
+    /*
+     <xml>
+     <ToUserName><![CDATA[<%= toUserName %>]]></ToUserName>
+     <FromUserName><![CDATA[<%= fromUserName %>]]></FromUserName>
+     <CreateTime><%= createTime %></CreateTime>
+     <MsgType><![CDATA[<%= msgType %>]]></MsgType>
+     <% if (msgType === "text") { %>
+        <Content><![CDATA[<%= content %>]]></Content>
+     <% } else if (msgType === "image") {%>
+        <Image>
+            <MediaId><![CDATA[<%= content.media_id %>]]></MediaId>
+        </Image>
+     <% } else if (msgType === "voice") {%>
+        <Voice>
+            <MediaId><![CDATA[<%= content.media_id %>]]></MediaId>
+        </Voice>
+     <% } else if (msgType === "video") {%>
+        <Video>
+             <MediaId><![CDATA[<%= content.media_id %>]]></MediaId>
+             <Title><![CDATA[<%= content.title %>]]></Title>
+            <Description><![CDATA[<%= content.description %>]]></Description>
+        </Video>
+     <% } else if (msgType === "music") {%>
+        <Music>
+            <Title><![CDATA[<%= content.title %>]]></Title>
+            <Description><![CDATA[<%= content.description %>]]></Description>
+            <MusicUrl><![CDATA[<%= content.musicUrl %>]]></MusicUrl>
+            <HQMusicUrl><![CDATA[<%= content.hqMusicUrl %>]]></HQMusicUrl>
+            <ThumbMediaId><![CDATA[<%= content.thumbMediaId %>]]></ThumbMediaId>
+        </Music>
+     <% } else if (msgType === "news") {%>
+        <ArticleCount><%= content.length %></ArticleCount>
+        <Articles>
+        <% content.forEach(function(item) { %>
+            <item>
+                <Title><![CDATA[<%= item.title %>]]></Title>
+                <Description><![CDATA[<%= item.description %>]]></Description>
+                <PicUrl><![CDATA[<%= item.picUrl %>]]></PicUrl>
+                <Url><![CDATA[<%= item.url %>]]></Url>
+            </item>
+        <% }) %>
+        </Articles>
+     <% } %>
+     </xml>
+    */
+});
 
 var compiled = ejs.compile(tpl)
 
