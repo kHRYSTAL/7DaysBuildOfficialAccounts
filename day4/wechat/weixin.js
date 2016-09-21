@@ -1,5 +1,10 @@
 'use strict'
 
+
+var config = require('./config')
+var Wechat = require('./wechat/wechat')
+
+var wechatApi = new Wechat(config.wechat)
 // handler 生成器 处理回复消息对象
 // generator 生成的对象存在一个 next 函数，
 // 程序执行到yield停止
@@ -68,6 +73,41 @@ exports.reply = function* (next) {
           picUrl: 'http://ww2.sinaimg.cn/large/72f96cbajw1f7yv45wiksg20cz0l9wld.gif',
           url: 'https://nodejs.org'
         }]
+      }
+      // 回复5发送图片
+      else if (content === '5') {
+        var data = yield wechatApi.uploadMaterial('image', __dirname +
+          '/2.jpg')
+
+        reply = {
+          type: 'image',
+          mediaId: data.media_id
+        }
+      }
+      // 回复6发送视频
+      else if (content === '6') {
+        var data = yield wechatApi.uploadMaterial('video', __dirname +
+          '/6.mp4')
+
+        reply = {
+          type: 'video',
+          title: '回复视频内容',
+          description: '回复视频描述',
+          mediaId: data.media_id
+        }
+      }
+      // 回复7发送音乐
+      else if (content === '7') {
+        var data = yield wechatApi.uploadMaterial('image', __dirname +
+          '/2.jpg')
+
+        reply = {
+          type: 'music',
+          title: '回复音乐内容',
+          description: '回复音乐描述',
+          musicUrl: 'http://sc1.111ttt.com/2016/4/09/22/202220006384.mp3',
+          thumbMediaId: data.media_id
+        }
       }
 
       this.body = reply

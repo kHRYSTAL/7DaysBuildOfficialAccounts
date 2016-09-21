@@ -1,8 +1,13 @@
 'use strict '
+
+var fs = require('fs')
 var prefix = 'https://api.weixin.qq.com/cgi-bin/'
 var api = {
   access_token: prefix +
-    'token?grant_type=client_credential'
+    'token?grant_type=client_credential',
+
+  upload: prefix +
+    'media/upload?'
 
 }
 var Promise = require('bluebird')
@@ -22,8 +27,19 @@ function Wechat(opts) {
   this.appSecret = opts.appSecret
   this.getAccessToken = opts.getAccessToken
   this.saveAccessToken = opts.saveAccessToken
+  this.fetchAccessToken()
+}
 
-  this.getAccessToken()
+Wechat.prototype.fetchAccessToken = function() {
+  var that = this
+
+  if (this.access_token && this.expires_in) {
+    if (this.isValidAccessToken(this)) {
+      return Promise.resolve(this)
+    }
+  }
+
+  return this.getAccessToken()
     .then(function(data) {
       try {
         data = JSON.parse(data)
@@ -45,6 +61,8 @@ function Wechat(opts) {
 
       // 存储
       that.saveAccessToken(data)
+
+      return Promise.resolve(data)
     })
 }
 
@@ -65,6 +83,7 @@ Wechat.prototype.isValidAccessToken = function(data) {
   }
 }
 
+// 从微信服务器更新票据
 Wechat.prototype.updateAccessToken = function() {
   var appID = this.appID
   var appSecret = this.appSecret
@@ -81,7 +100,36 @@ Wechat.prototype.updateAccessToken = function() {
 
       data.expires_in = expires_in
       resolve(data)
+    })
+  })
+}
 
+// 上传素材
+Wechat.prototype.uploadMaterial = function(type, filepath) {
+  var that = this
+  var form = {
+    // 创建可读流
+    media: fs.createReadStream(filepath)
+  }
+  return new Promise(function(resolve, reject) {
+    that
+      .fetchAccessToken() // 获取全局票据
+      .then(function(data) {
+        var url = api.upload + '&access_token='
+          + data.access_token + '&type=' + type
+        request({method: 'POST', url: url, formData: form, json: true})
+        .then(function (response) {
+            var _data = response.body
+            if (_data) {
+              resolve(_data)
+            }
+            else {
+              throw new Error('Upload material fails')
+            }
+        })
+        .catch(function(err) {
+          reject(err)
+        })
     })
   })
 }

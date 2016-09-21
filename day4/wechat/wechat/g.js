@@ -56,7 +56,6 @@ module.exports = function(opts, handler) {
       // value类型xml里为数组 需要修改
       //将xml格式转换为实际对象（格式化）打印
       // watch 76
-      console.log(content)
       var message = util.formatMessage(content.xml)
       console.log(message)
 
