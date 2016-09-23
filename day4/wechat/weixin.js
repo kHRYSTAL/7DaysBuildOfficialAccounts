@@ -110,6 +110,98 @@ exports.reply = function* (next) {
         }
       }
 
+      // 回复8发送图片 ,上传永久素材
+      else if (content === '8') {
+        var data = yield wechatApi.uploadMaterial('image', __dirname +
+          '/2.jpg', {type: 'image'})
+
+        reply = {
+          type: 'image',
+          mediaId: data.media_id
+        }
+      }
+
+      // 回复9发送视频 ,上传永久素材
+      else if (content === '9') {
+        var data = yield wechatApi.uploadMaterial('video', __dirname +
+          '/6.mp4', {type: 'video',
+          description: '{"title": "Really a nice place", "introduction" : "Never think it so easy"}'})
+
+          reply = {
+            type: 'video',
+            title: '回复视频内容',
+            description: '回复视频描述',
+            mediaId: data.media_id
+          }
+      }
+
+      // 回复10发送图片 ,上传永久素材 获取图片id 组成图文news
+      else if (content === '10') {
+        var picData = yield wechatApi.uploadMaterial('image', __dirname +
+          '/2.jpg', {})
+
+          var media = {
+            articles: [
+              title: 'tututu1',
+              thumb_media_id: picData.media_id,
+              author: 'kHRYSTAL',
+              digest: '没有摘要',
+              show_cover_pic: 1,// 是否显示缩略图
+              content: '没有内容',
+              content_source_url: 'https://github.com' //阅读全文链接
+            ]
+          }
+
+          data = yield wechatApi.uploadMaterial('news', media, {})
+// 测试根据图文id获取图文对象 并打印
+          data = yield wechatApi.fetchMaterial(data.media_id)
+          console.log(data)
+
+          var items = data.news_item
+          var news = []
+
+          items.forEach(function(item) {
+            news.push({
+              title.item.title,
+              description: item.digest,
+              picUrl: picData.url
+            })
+          })
+
+          reply = news
+      }
+      else if(count === '10') {
+        var counts = yield wechatApi.countMaterial()
+
+        console.log(JSON.stringify(counts));
+
+        var results = yield[
+          wechatApi.batchMaterial({
+            type :'image',
+            offset: 0,
+            count: 10
+          }),
+          wechatApi.batchMaterial({
+            type :'video',
+            offset: 0,
+            count: 10
+          }),
+          wechatApi.batchMaterial({
+            type :'voice',
+            offset: 0,
+            count: 10
+          }),
+          wechatApi.batchMaterial({
+            type :'news',
+            offset: 0,
+            count: 10
+          })]
+
+          console.log(JSON.stringify(results));
+          reply = '1'
+
+      }
+
       this.body = reply
   }
   yield next
