@@ -14,7 +14,7 @@ var api = {
   // 上传临时素材
   temporary : {
     upload: prefix + 'media/upload?',
-    fetch: prefix + 'media/get' //获取远端临时素材
+    fetch: prefix + 'media/get?' //获取远端临时素材
   },
   // 上传永久素材
   permanent : {
@@ -49,7 +49,9 @@ var api = {
     // 设置备注名
     remark: prefix + 'user/info/updateremark?',
     fetch: prefix + 'user/info?',
-    batchfetch: prefix + 'user/info/batchget?'
+    batchfetch: prefix + 'user/info/batchget?',
+    // 获取用户列表
+    list: prefix + 'user/get?'
   }
 
 }
@@ -173,7 +175,7 @@ Wechat.prototype.uploadMaterial = function(type, material, permanent) {
     that
       .fetchAccessToken() // 获取全局票据
       .then(function(data) {
-        var url = uploadUrl + '&access_token='
+        var url = uploadUrl + 'access_token='
           + data.access_token
           // 如果不是永久类型
         if (!permanent) {
@@ -284,7 +286,7 @@ Wechat.prototype.deleteMaterial = function(mediaId) {
     that
       .fetchAccessToken() // 获取全局票据
       .then(function(data) {
-        var url = api.permanent.del + '&access_token='
+        var url = api.permanent.del + 'access_token='
           + data.access_token + '&media_id=' + media_id
 
         request({method: 'POST', url: url, body: form, json: true})
@@ -318,7 +320,7 @@ Wechat.prototype.updateMaterial = function(mediaId, news) {
     that
       .fetchAccessToken() // 获取全局票据
       .then(function(data) {
-        var url = api.permanent.update + '&access_token='
+        var url = api.permanent.update + 'access_token='
           + data.access_token + '&media_id=' + media_id
 // json - sets body to JSON representation of value and adds Content-type: application/json header. Additionally, parses the response body as JSON.
         request({method: 'POST', url: url, body: form, json: true})
@@ -352,7 +354,7 @@ Wechat.prototype.countMaterial = function() {
     that
       .fetchAccessToken() // 获取全局票据
       .then(function(data) {
-        var url = api.permanent.count + '&access_token='
+        var url = api.permanent.count + 'access_token='
           + data.access_token
 
         request({method: 'GET', url: url, json: true})
@@ -392,7 +394,7 @@ Wechat.prototype.batchMaterial = function(options) {
     that
       .fetchAccessToken() // 获取全局票据
       .then(function(data) {
-        var url = api.permanent.batch + '&access_token='
+        var url = api.permanent.batch + 'access_token='
           + data.access_token
 
         request({method: 'POST', url: url, body: options, json: true})
@@ -420,7 +422,7 @@ Wechat.prototype.createGroup = function(name) {
     that
       .fetchAccessToken() // 获取全局票据
       .then(function(data) {
-        var url = api.group.create + '&access_token='
+        var url = api.group.create + 'access_token='
           + data.access_token
 
         var options = {
@@ -454,7 +456,7 @@ Wechat.prototype.fetchGroups = function() {
     that
       .fetchAccessToken() // 获取全局票据
       .then(function(data) {
-        var url = api.group.fetch + '&access_token='
+        var url = api.group.fetch + 'access_token='
           + data.access_token
         request({url: url, json: true})
         .then(function (response) {
@@ -481,7 +483,7 @@ Wechat.prototype.checkGroup = function(openId) {
     that
       .fetchAccessToken() // 获取全局票据
       .then(function(data) {
-        var url = api.group.check + '&access_token='
+        var url = api.group.check + 'access_token='
           + data.access_token
 
         var form = {
@@ -512,7 +514,7 @@ Wechat.prototype.updateGroup = function(groupId, name) {
     that
       .fetchAccessToken() // 获取全局票据
       .then(function(data) {
-        var url = api.group.update + '&access_token='
+        var url = api.group.update + 'access_token='
           + data.access_token
 
         var form = {
@@ -553,12 +555,12 @@ Wechat.prototype.batchGroup = function(openIds, toGroupId) {
         }
 
         if(_.isArray(openIds)) {
-          url = api.group.batchupdate + '&access_token='
+          url = api.group.batchupdate + 'access_token='
             + data.access_token
           form.openid_list = openIds
         }
         else {
-          url = api.group.move + '&access_token='
+          url = api.group.move + 'access_token='
             + data.access_token
           form.openid = openIds
         }
@@ -587,7 +589,7 @@ Wechat.prototype.deleteGroup = function(groupId) {
     that
       .fetchAccessToken() // 获取全局票据
       .then(function(data) {
-        var url = api.group.del + '&access_token='
+        var url = api.group.del + 'access_token='
           + data.access_token
 
         var form = {
@@ -620,7 +622,7 @@ Wechat.prototype.remarkUser = function(openId, remark) {
     that
       .fetchAccessToken() // 获取全局票据
       .then(function(data) {
-        var url = api.user.remark + '&access_token='
+        var url = api.user.remark + 'access_token='
           + data.access_token
 
         var options = {
@@ -661,7 +663,7 @@ Wechat.prototype.fetchUsers = function(openIds, lang) {
         }
 
         if (_.isArray(openIds)) {
-          options.url = api.user.batchfetch + '&access_token='
+          options.url = api.user.batchfetch + 'access_token='
             + data.access_token
           options.body  = {
              user_list: openIds,
@@ -669,7 +671,7 @@ Wechat.prototype.fetchUsers = function(openIds, lang) {
           options.method = 'POST'
         }
         else {
-          options.url = api.user.fetch + '&access_token='
+          options.url = api.user.fetch + 'access_token='
             + data.access_token + '&openid=' + openIds + '&lang=' + lang
 
           options.method = 'GET'
@@ -683,6 +685,37 @@ Wechat.prototype.fetchUsers = function(openIds, lang) {
             }
             else {
               throw new Error('create Group error!')
+            }
+        })
+        .catch(function(err) {
+          reject(err)
+        })
+    })
+  })
+}
+
+Wechat.prototype.listUsers = function(openId) {
+  var that = this
+
+  return new Promise(function(resolve, reject) {
+    that
+      .fetchAccessToken() // 获取全局票据
+      .then(function(data) {
+        var url = api.user.list + 'access_token='
+          + data.access_token
+
+        if (openId) {
+          url += '&next_openid' + openId
+        }
+
+        request({method: 'GET', url: url, json: true})
+        .then(function (response) {
+            var _data = response.body
+            if (_data) {
+              resolve(_data)
+            }
+            else {
+              throw new Error('list users error!')
             }
         })
         .catch(function(err) {

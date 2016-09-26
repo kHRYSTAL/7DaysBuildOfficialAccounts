@@ -164,7 +164,7 @@ exports.reply = function* (next) {
           console.log('upload success!');
           console.log(data);
 // 测试根据图文id获取图文对象 并打印 data.media_id  测试数据 s7T8R4zwxWXoNWjsWxs-wc46FJSOt_ZaG7EWJXC1-Y0
-          data = yield wechatApi.fetchMaterial('s7T8R4zwxWXoNWjsWxs-wc46FJSOt_ZaG7EWJXC1-Y0', 'news', {})
+          data = yield wechatApi.fetchMaterial(data.media_id, 'news', {})
           console.log(data)
 
           var items = data.news_item
@@ -258,6 +258,12 @@ exports.reply = function* (next) {
         console.log(users);
 
         reply = JSON.stringify(user)
+      }
+      else if (content === '14') {
+        var userlist = yield wechatApi.listUsers()
+        console.log(userlist);
+
+        reply = userlist.total
       }
 
       this.body = reply
