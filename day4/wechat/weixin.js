@@ -141,20 +141,30 @@ exports.reply = function* (next) {
           '/2.jpg', {})
 
           var media = {
-            articles: [
-              title: 'tututu1',
-              thumb_media_id: picData.media_id,
-              author: 'kHRYSTAL',
-              digest: '没有摘要',
-              show_cover_pic: 1,// 是否显示缩略图
-              content: '没有内容',
-              content_source_url: 'https://github.com' //阅读全文链接
-            ]
+            articles: [{
+                    title: 'cool1',
+                    thumb_media_id: picData.media_id,
+                    author: 'khrystal',
+                    digest: '没有摘要',
+                    show_cover_pic: 1,
+                    content: '没有内容',
+                    content_source_url: 'http://github.com'
+                },{
+                    title: 'cool3',
+                    thumb_media_id: picData.media_id,
+                    author: 'khrystal',
+                    digest: '没有摘要',
+                    show_cover_pic: 1,
+                    content: '没有内容',
+                    content_source_url: 'http://github.com'
+                }]
           }
 
           data = yield wechatApi.uploadMaterial('news', media, {})
-// 测试根据图文id获取图文对象 并打印
-          data = yield wechatApi.fetchMaterial(data.media_id)
+          console.log('upload success!');
+          console.log(data);
+// 测试根据图文id获取图文对象 并打印 data.media_id  测试数据 s7T8R4zwxWXoNWjsWxs-wc46FJSOt_ZaG7EWJXC1-Y0
+          data = yield wechatApi.fetchMaterial('s7T8R4zwxWXoNWjsWxs-wc46FJSOt_ZaG7EWJXC1-Y0', 'news', {})
           console.log(data)
 
           var items = data.news_item
@@ -162,7 +172,7 @@ exports.reply = function* (next) {
 
           items.forEach(function(item) {
             news.push({
-              title.item.title,
+              title: item.title,
               description: item.digest,
               picUrl: picData.url
             })
@@ -170,7 +180,7 @@ exports.reply = function* (next) {
 
           reply = news
       }
-      else if(count === '10') {
+      else if(content === '11') {
         var counts = yield wechatApi.countMaterial()
 
         console.log(JSON.stringify(counts));
@@ -199,7 +209,55 @@ exports.reply = function* (next) {
 
           console.log(JSON.stringify(results));
           reply = '1'
+      }
+      // 该接口已废弃
+      else if (content === '12') {
+        var group = yield wechatApi.createGroup('wechat')
+        console.log('新分组：');
+        console.log(group);
+        var groups = yield wechatApi.fetchGroups()
 
+        console.log('加了wechat后的分组列表');
+        console.log(groups);
+
+        // 查询发送消息用户的所在分组
+        var group2 = yield wechatApi.checkGroup(message.FromUserName)
+        console.log('查看用户分组');
+        console.log(group2);
+
+        // var result = yield wechatApi.moveGroup(message.FromUserName,
+        //   118)
+        //
+        // console.log(result);
+        // console.log('移动到118');
+        // console.log('移动后的分组列表');
+        // var group3 = yield wechatApi.fetchGroups()
+        // console.log(groups);
+        //
+        // var result2 = yield wechatApi.moveGroup([message.FromUserName],
+        //   116)
+        // console.log(result2);
+        // console.log('批量移动到116');
+        // console.log('移动后的分组列表');
+        // var group4 = yield wechatApi.fetchGroups()
+        // console.log(groups);
+
+        reply = 'group done'
+      }
+      else if (content === '13') {
+        var user = yield wechatApi.fetchUsers(message.FromUserName, 'zh_CN')
+        console.log(user);
+// 模拟批量获取
+        var openIds = [
+          {
+            openid: message.FromUserName,
+            lang: 'zh_CN'
+          }
+        ]
+        var users = yield wechatApi.fetchUsers(openIds)
+        console.log(users);
+
+        reply = JSON.stringify(user)
       }
 
       this.body = reply

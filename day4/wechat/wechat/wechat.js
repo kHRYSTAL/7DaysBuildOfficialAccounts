@@ -13,7 +13,7 @@ var api = {
     'token?grant_type=client_credential',
   // 上传临时素材
   temporary : {
-    upload: prefix + 'media/upload?'
+    upload: prefix + 'media/upload?',
     fetch: prefix + 'media/get' //获取远端临时素材
   },
   // 上传永久素材
@@ -26,8 +26,31 @@ var api = {
     update: prefix + 'material/update_news?', //更新
     count: prefix + 'material/get_materialcount?',//获取素材总数
     batch: prefix + 'material/batchget_material?'// 批量获取素材列表
-  }
+  },
+  // 分组
+  group : {
+    // 创建分组
+    create: prefix + 'groups/create?',
+    // 查询分组
+    fetch: prefix + 'groups/get?',
+    // 查询用户所在分组
+    check: prefix + 'groups/getid?',
+    // 修改分组名
+    update: prefix + 'groups/update?',
+    // 移动用户所在组
+    move: prefix + 'groups/members/update?',
+    // 批量移动用户所在组
+    batchupdate: prefix + 'groups/members/batchupdate?',
+    // 删除分组
+    del: prefix + 'groups/delete?'
+  },
 
+  user: {
+    // 设置备注名
+    remark: prefix + 'user/info/updateremark?',
+    fetch: prefix + 'user/info?',
+    batchfetch: prefix + 'user/info/batchget?'
+  }
 
 }
 
@@ -142,7 +165,7 @@ Wechat.prototype.uploadMaterial = function(type, material, permanent) {
     form = material
   }
   else {
-    from.media = fs.createReadStream(material)
+    form.media = fs.createReadStream(material)
   }
 
 
@@ -162,7 +185,7 @@ Wechat.prototype.uploadMaterial = function(type, material, permanent) {
         var options = {
           method: 'POST',
           url: url,
-          json = true
+          json: true
         }
 
         if (type === 'news') {
@@ -205,15 +228,16 @@ Wechat.prototype.fetchMaterial = function(mediaId, type, permanent) {
     that
       .fetchAccessToken() // 获取全局票据
       .then(function(data) {
-        var url = fetchUrl + '&access_token='
+        var url = fetchUrl + 'access_token='
           + data.access_token
         var form = {}
 
         var options = {methd: 'POST', url: url, json: true}
 
         if (permanent) {
-          form.media_id: mediaId,
-          form.access_token: data.access_token
+
+          form.media_id = mediaId,
+          form.access_token = data.access_token,
           options.body = form
         }
         else {
@@ -224,6 +248,7 @@ Wechat.prototype.fetchMaterial = function(mediaId, type, permanent) {
         }
 
         if (type === 'news' || type === 'video') {
+          console.log(options);
           request(options)
           .then(function (response) {
               var _data = response.body
@@ -317,11 +342,11 @@ Wechat.prototype.updateMaterial = function(mediaId, news) {
 Wechat.prototype.countMaterial = function() {
   var that = this
 
-  var form = {
-    media_id: media_id
-  }
-
-  _.extend(form, news)
+  // var form = {
+  //   media_id: media_id
+  // }
+  //
+  // _.extend(form, news)
 
   return new Promise(function(resolve, reject) {
     that
@@ -357,11 +382,11 @@ Wechat.prototype.batchMaterial = function(options) {
   options.count = options.type || 1 //返回素材的数量，取值在1到20之间
 
 
-  var form = {
-    media_id: media_id
-  }
-
-  _.extend(form, news)
+  // var form = {
+  //   media_id: media_id
+  // }
+  //
+  // _.extend(form, news)
 
   return new Promise(function(resolve, reject) {
     that
@@ -378,6 +403,286 @@ Wechat.prototype.batchMaterial = function(options) {
             }
             else {
               throw new Error('Count material fails')
+            }
+        })
+        .catch(function(err) {
+          reject(err)
+        })
+    })
+  })
+}
+
+// 创建分组
+Wechat.prototype.createGroup = function(name) {
+  var that = this
+
+  return new Promise(function(resolve, reject) {
+    that
+      .fetchAccessToken() // 获取全局票据
+      .then(function(data) {
+        var url = api.group.create + '&access_token='
+          + data.access_token
+
+        var options = {
+          group: {
+            name: name
+          }
+        }
+
+        request({method: 'POST', url: url, body: options, json: true})
+        .then(function (response) {
+            var _data = response.body
+            if (_data) {
+              resolve(_data)
+            }
+            else {
+              throw new Error('create Group error!')
+            }
+        })
+        .catch(function(err) {
+          reject(err)
+        })
+    })
+  })
+}
+
+// 获取分组
+Wechat.prototype.fetchGroups = function() {
+  var that = this
+
+  return new Promise(function(resolve, reject) {
+    that
+      .fetchAccessToken() // 获取全局票据
+      .then(function(data) {
+        var url = api.group.fetch + '&access_token='
+          + data.access_token
+        request({url: url, json: true})
+        .then(function (response) {
+            var _data = response.body
+            if (_data) {
+              resolve(_data)
+            }
+            else {
+              throw new Error('fetch Group error!')
+            }
+        })
+        .catch(function(err) {
+          reject(err)
+        })
+    })
+  })
+}
+
+// 通过用户openid 查询所在分组
+Wechat.prototype.checkGroup = function(openId) {
+  var that = this
+
+  return new Promise(function(resolve, reject) {
+    that
+      .fetchAccessToken() // 获取全局票据
+      .then(function(data) {
+        var url = api.group.check + '&access_token='
+          + data.access_token
+
+        var form = {
+          openid: openId
+        }
+        request({method: 'POST', url: url, body: form, json: true})
+        .then(function (response) {
+            var _data = response.body
+            if (_data) {
+              resolve(_data)
+            }
+            else {
+              throw new Error('check user from Group error!')
+            }
+        })
+        .catch(function(err) {
+          reject(err)
+        })
+    })
+  })
+}
+
+// 更新分组名称
+Wechat.prototype.updateGroup = function(groupId, name) {
+  var that = this
+
+  return new Promise(function(resolve, reject) {
+    that
+      .fetchAccessToken() // 获取全局票据
+      .then(function(data) {
+        var url = api.group.update + '&access_token='
+          + data.access_token
+
+        var form = {
+          group: {
+            id: groupId,
+            name: name
+          }
+        }
+        request({method: POST, url: url, body: form, json: true})
+        .then(function (response) {
+            var _data = response.body
+            if (_data) {
+              resolve(_data)
+            }
+            else {
+              throw new Error('update Group error!')
+            }
+        })
+        .catch(function(err) {
+          reject(err)
+        })
+    })
+  })
+}
+
+
+// 批量移动或单个移动
+Wechat.prototype.batchGroup = function(openIds, toGroupId) {
+  var that = this
+
+  return new Promise(function(resolve, reject) {
+    that
+      .fetchAccessToken() // 获取全局票据
+      .then(function(data) {
+        var url
+        var form = {
+          to_groupid: toGroupId
+        }
+
+        if(_.isArray(openIds)) {
+          url = api.group.batchupdate + '&access_token='
+            + data.access_token
+          form.openid_list = openIds
+        }
+        else {
+          url = api.group.move + '&access_token='
+            + data.access_token
+          form.openid = openIds
+        }
+        request({method: POST, url: url, body: form, json: true})
+        .then(function (response) {
+            var _data = response.body
+            if (_data) {
+              resolve(_data)
+            }
+            else {
+              throw new Error('move Group error!')
+            }
+        })
+        .catch(function(err) {
+          reject(err)
+        })
+    })
+  })
+}
+
+// 删除分组
+Wechat.prototype.deleteGroup = function(groupId) {
+  var that = this
+
+  return new Promise(function(resolve, reject) {
+    that
+      .fetchAccessToken() // 获取全局票据
+      .then(function(data) {
+        var url = api.group.del + '&access_token='
+          + data.access_token
+
+        var form = {
+          group :{
+            id: groupId
+          }
+        }
+
+        request({method: POST, url: url, body: form, json: true})
+        .then(function (response) {
+            var _data = response.body
+            if (_data) {
+              resolve(_data)
+            }
+            else {
+              throw new Error('delete Group error!')
+            }
+        })
+        .catch(function(err) {
+          reject(err)
+        })
+    })
+  })
+}
+
+Wechat.prototype.remarkUser = function(openId, remark) {
+  var that = this
+
+  return new Promise(function(resolve, reject) {
+    that
+      .fetchAccessToken() // 获取全局票据
+      .then(function(data) {
+        var url = api.user.remark + '&access_token='
+          + data.access_token
+
+        var options = {
+          openid: openId,
+          remark: remark
+        }
+
+        request({method: 'POST', url: url, body: options, json: true})
+        .then(function (response) {
+            var _data = response.body
+            if (_data) {
+              resolve(_data)
+            }
+            else {
+              throw new Error('remark user error!')
+            }
+        })
+        .catch(function(err) {
+          reject(err)
+        })
+    })
+  })
+}
+
+//  单个或批量获取用户信息
+Wechat.prototype.fetchUsers = function(openIds, lang) {
+  var that = this
+  lang = lang || 'zh_CN'
+
+  return new Promise(function(resolve, reject) {
+    that
+      .fetchAccessToken() // 获取全局票据
+      .then(function(data) {
+        var url
+        var form
+        var options = {
+          json: true
+        }
+
+        if (_.isArray(openIds)) {
+          options.url = api.user.batchfetch + '&access_token='
+            + data.access_token
+          options.body  = {
+             user_list: openIds,
+          }
+          options.method = 'POST'
+        }
+        else {
+          options.url = api.user.fetch + '&access_token='
+            + data.access_token + '&openid=' + openIds + '&lang=' + lang
+
+          options.method = 'GET'
+        }
+
+        request(options)
+        .then(function (response) {
+            var _data = response.body
+            if (_data) {
+              resolve(_data)
+            }
+            else {
+              throw new Error('create Group error!')
             }
         })
         .catch(function(err) {
