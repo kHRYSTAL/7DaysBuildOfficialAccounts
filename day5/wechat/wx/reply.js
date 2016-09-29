@@ -7,13 +7,13 @@ var menu = require('./menu')
 var wechatApi = new Wechat(config.wechat)
 
 
-
-wechatApi.deleteMenu()
-.then(function() {
-  return wechatApi.createMenu(menu)
-}).then(function(msg) {
-  console.log(msg);
-})
+// 创建一次 在微信服务器保留即可
+// wechatApi.deleteMenu()
+// .then(function() {
+//   return wechatApi.createMenu(menu)
+// }).then(function(msg) {
+//   console.log(msg);
+// })
 
 
 
@@ -312,6 +312,7 @@ exports.reply = function* (next) {
 
         reply = userlist.total
       }
+      // 群发消息接口
       else if (content === '15') {
 
         // var mpnews = {
@@ -360,6 +361,55 @@ exports.reply = function* (next) {
         msgData = yield wechatApi.sendByGroup('text', text, 0)
         reply = 'check success'
 
+      }
+      else if (content === '18') {
+        var tempQr = {
+          expire_seconds: 400000,
+          action_name: 'QR_SCENE',
+          action_info: {
+            scene: {
+              // 场景值 用于渠道分析的value
+              scene_id: 123
+            }
+          }
+        }
+
+        var permQr = {
+          action_name: 'QR_LIMIT_SCENE',
+          action_info: {
+            scene: {
+              // 场景值 用于渠道分析的value
+              scene_id: 123
+            }
+          }
+        }
+
+        var permStrQr = {
+          action_name: 'QR_LIMIT_STR_SCENE',
+          action_info: {
+            scene: {
+              // 场景值 用于渠道分析的value
+              scene_str: '可填字符串'
+            }
+          }
+        }
+        var qr1 = yield wechatApi.createQrcode(tempQr)
+        var qr2 = yield wechatApi.createQrcode(permQr)
+        var qr3 = yield wechatApi.createQrcode(permStrQr)
+
+        reply = wechatApi.showQrcode(qr1.ticket)
+        var text = {}
+        text.content = reply
+        yield wechatApi.sendByGroup('text', text, 0)
+
+
+      }
+      // 转换短链接 用于支付等情景
+      else if(content === '19') {
+        var longUrl = 'https://mp.weixin.qq.com/wiki/6/d2ec191ffdf5a596238385f75f95ecbe.html'
+        var shortData = yield wechatApi.createShortUrl(null, longUrl)
+        console.log(JSON.stringify(shortData));
+        reply = shortData.short_url
       }
 
       this.body = reply

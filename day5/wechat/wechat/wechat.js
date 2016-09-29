@@ -2,6 +2,7 @@
 
 var fs = require('fs')
 var prefix = 'https://api.weixin.qq.com/cgi-bin/'
+var mp_prefix = 'https://mp.weixin.qq.com/cgi-bin/'
 var _ = require('lodash')
 var Promise = require('bluebird')
 // promise化request 将callback promise化
@@ -73,6 +74,16 @@ var api = {
     del: prefix + 'menu/delete?',
     // 获取自定义菜单配置接口
     current: prefix + 'get_current_selfmenu_info?'
+  },
+  qrcode: {
+    // 创建二维码ticket 获取接口
+    create: prefix + 'qrcode/create?',
+    // 通过ticket获取 二维码图片
+    show: mp_prefix + 'showqrcode?'
+  },
+  // 长链接转短链接接口
+  shortUrl: {
+    create: prefix + 'shorturl?',
   }
 
 }
@@ -1032,6 +1043,74 @@ Wechat.prototype.getCurrentMenu = function(menu) {
             }
             else {
               throw new Error('get current menu error!')
+            }
+        })
+        .catch(function(err) {
+          reject(err)
+        })
+    })
+  })
+}
+
+// 获取二维码ticket
+Wechat.prototype.createQrcode = function(qr) {
+  var that = this
+
+  return new Promise(function(resolve, reject) {
+    that
+      .fetchAccessToken() // 获取全局票据
+      .then(function(data) {
+        var url = api.qrcode.create + 'access_token='
+          + data.access_token
+
+        request({method: 'POST', url: url, body: qr, json: true})
+        .then(function (response) {
+            var _data = response.body
+            if (_data) {
+              resolve(_data)
+            }
+            else {
+              throw new Error('create qrode error!')
+            }
+        })
+        .catch(function(err) {
+          reject(err)
+        })
+    })
+  })
+}
+
+// 通过ticket获取二维码图片
+Wechat.prototype.showQrcode = function(ticket) {
+  return api.qrcode.show + 'ticket=' + encodeURI(ticket)
+}
+
+// 长链接转短链接
+Wechat.prototype.createShortUrl = function(action, url) {
+  action = action || 'long2short'
+
+  var that = this
+
+  return new Promise(function(resolve, reject) {
+    that
+      .fetchAccessToken() // 获取全局票据
+      .then(function(data) {
+        var url = api.shortUrl.create + 'access_token='
+          + data.access_token
+
+        var form = {
+          action: action,
+          long_url: url
+        }
+
+        request({method:'POST', url: url, body: form, json: true})
+        .then(function (response) {
+            var _data = response.body
+            if (_data) {
+              resolve(_data)
+            }
+            else {
+              throw new Error('create short url error!')
             }
         })
         .catch(function(err) {
