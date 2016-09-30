@@ -14,9 +14,43 @@ var config = require('./config')
 var reply = require('./wx/reply')
 
 var Koa = require('koa')
-
-
 var app = new Koa()
+
+var ejs = require('ejs')
+var heredoc = require('heredoc')
+
+var fs = require('fs')
+
+var tpl = heredoc(function() {/*
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>猜电影</title>
+      <meta name="viewport" content="initial-scale=1, maximum-scale=1,minimum-scale=1">
+    </head>
+    <body>
+      <h1>点击标题,开始录音翻译</h1>
+      <p id="title"></p>
+      <div id="poster"></div>
+      <script src="http://zeptojs.com/zepto-docs.min.js"></script>
+      <script src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+    </body>
+  </html>
+*/})
+
+app.use(function *(next) {
+  if (this.url.indexOf('/movie') > -1) {
+    this.body = ejs.render(tpl, {})
+    return next
+  }
+  else if (this.url.indexOf('/getImage') > -1) {
+    var source = fs.readFileSync('6.mp4')
+    this.body = source
+    return next
+  }
+  yield next
+})
+
 
 // function * mean generator
 // 内部包含 yield 在koa中会最终使用co & promise

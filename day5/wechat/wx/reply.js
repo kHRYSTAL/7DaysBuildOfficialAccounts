@@ -411,6 +411,17 @@ exports.reply = function* (next) {
         console.log(JSON.stringify(shortData));
         reply = shortData.short_url
       }
+      // 语义　该接口需要认证
+      else if(content === '20') {
+        var semanticData = {
+          query: "寻龙诀",
+          city: "天津",
+          category: "movie",
+          uid: message.FromUserName
+        }
+        var _data = yield wechatApi.semantic(semanticData)
+        console.log(_data);
+      }
 
       this.body = reply
   }

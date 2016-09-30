@@ -19,7 +19,6 @@ var config = {
 }
 
 var app = new Koa()
-
 // function * mean generator
 app.use(function *(next) {
   console.log(this.query)

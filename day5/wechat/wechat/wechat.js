@@ -3,6 +3,8 @@
 var fs = require('fs')
 var prefix = 'https://api.weixin.qq.com/cgi-bin/'
 var mp_prefix = 'https://mp.weixin.qq.com/cgi-bin/'
+var semantic_url = 'https://api.weixin.qq.com/semantic/search?'
+
 var _ = require('lodash')
 var Promise = require('bluebird')
 // promise化request 将callback promise化
@@ -10,6 +12,7 @@ var request = Promise.promisify(require('request'))
 var util = require('./util')
 
 var api = {
+  semantic_url: semantic_url,
   access_token: prefix +
     'token?grant_type=client_credential',
   // 上传临时素材
@@ -83,9 +86,8 @@ var api = {
   },
   // 长链接转短链接接口
   shortUrl: {
-    create: prefix + 'shorturl?',
+    create: prefix + 'shorturl?'
   }
-
 }
 
 
@@ -1111,6 +1113,35 @@ Wechat.prototype.createShortUrl = function(action, url) {
             }
             else {
               throw new Error('create short url error!')
+            }
+        })
+        .catch(function(err) {
+          reject(err)
+        })
+    })
+  })
+}
+
+// 语义接口
+Wechat.prototype.semantic = function(semanticData) {
+  var that = this
+
+  return new Promise(function(resolve, reject) {
+    that
+      .fetchAccessToken() // 获取全局票据
+      .then(function(data) {
+        var url = semantic_url + 'access_token='
+          + data.access_token
+        semanticData.appid = this.appID
+
+        request({method:'POST', url: url, body: data, json: true})
+        .then(function (response) {
+            var _data = response.body
+            if (_data) {
+              resolve(_data)
+            }
+            else {
+              throw new Error('semantic error!')
             }
         })
         .catch(function(err) {
