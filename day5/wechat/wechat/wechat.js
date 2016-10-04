@@ -87,6 +87,10 @@ var api = {
   // 长链接转短链接接口
   shortUrl: {
     create: prefix + 'shorturl?'
+  },
+  // js－sdk 获取票据接口
+  ticket: {
+    get: prefix + 'ticket/getticket?'
   }
 }
 
@@ -142,12 +146,56 @@ Wechat.prototype.fetchAccessToken = function() {
     })
 }
 
+// 获取js sdk 票据
+Wechat.prototype.fetchTicket = function(access_token) {
+  var that = this
+
+  return this.getTicket()
+    .then(function(data) {
+      try {
+        data = JSON.parse(data)
+      }
+      catch(e) { // 如果不合法 需要更新
+        return that.updateTicket(access_token)
+      }
+
+      if (that.isValidTicket(data)) {
+        return Promise.resolve(data)
+      }
+      else { // 如果不合法 需要更新data
+        return that.updateTicket(access_token)
+      }
+    }).then(function(data) {
+      // 存储
+      that.saveTicket(data)
+
+      return Promise.resolve(data)
+    })
+}
+
 Wechat.prototype.isValidAccessToken = function(data) {
   if (!data || !data.access_token || !data.expires_in) {
     return false
   }
 
   var access_token = data.access_token
+  var expires_in = data.expires_in
+  var now = (new Date().getTime())
+
+  if (ticket && now < expires_in) {
+    return true
+  }
+  else {
+    return false
+  }
+}
+
+Wechat.prototype.isValidTicket = function(data) {
+  if (!data || !data.ticket || !data.expires_in) {
+    return false
+  }
+
+  var ticket = data.ticket
   var expires_in = data.expires_in
   var now = (new Date().getTime())
 
@@ -164,6 +212,25 @@ Wechat.prototype.updateAccessToken = function() {
   var appID = this.appID
   var appSecret = this.appSecret
   var url = api.access_token + '&appid=' + appID + '&secret='
+    + appSecret
+
+  return new Promise(function(resolve, reject) {
+    request({url: url, json: true}).then(function (response) {
+
+      var data = response.body
+      console.log(data);
+      var now = (new Date().getTime())
+      var expires_in = now + (data.expires_in - 20) * 1000
+
+      data.expires_in = expires_in
+      resolve(data)
+    })
+  })
+}
+
+
+Wechat.prototype.updateTicket = function(access_token) {
+  var url = api.ticket.get + '&access_token=' + access_token + '&type=jsapi'
     + appSecret
 
   return new Promise(function(resolve, reject) {

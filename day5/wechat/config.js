@@ -5,7 +5,8 @@ var util = require('./libs/util')
 // 加密模块
 var sha1 = require('sha1')
 var wechat = require('./wechat/g')
-var wechat_file = path.join(__dirname,'./config/wechat.txt')
+var wechat_file = path.join(__dirname, './config/wechat.txt')
+var wechat_ticket_file = path.join(__dirname, './config/wechat_ticket.txt')
 
 // input by yourself
 var config = {
@@ -19,6 +20,14 @@ var config = {
     saveAccessToken: function(data) {
       data = JSON.stringify(data)
       return util.writeFileAsync(wechat_file, data)
+    },
+
+    getTicket: function() {
+      return util.readFileAsync(wechat_ticket_file)
+    },
+    saveTicket: function(data) {
+      data = JSON.stringify(data)
+      return util.writeFileAsync(wechat_ticket_file, data)
     }
   }
 }

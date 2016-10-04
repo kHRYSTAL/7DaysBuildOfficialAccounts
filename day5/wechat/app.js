@@ -12,10 +12,11 @@ var wechat = require('./wechat/g')
 var wechat_file = path.join(__dirname,'./config/wechat.txt')
 var config = require('./config')
 var reply = require('./wx/reply')
+var Wechat = require('./wechat/wechat')
 
 var Koa = require('koa')
 var app = new Koa()
-
+var crypto = require('crypto')
 var ejs = require('ejs')
 var heredoc = require('heredoc')
 
@@ -38,16 +39,56 @@ var tpl = heredoc(function() {/*
   </html>
 */})
 
+//  生成随机数
+var createNonce = function() {
+  return Math.random().toString(36).substr(2, 15)
+}
+
+// 生成时间戳
+var createTimestamp = function() {
+  return parseInt(new Date().getTime() / 1000, 10) + ''
+}
+
+var _sign = function(noncestr, ticket, timestamp, url) {
+  var params = [
+    'noncestr=' + noncestr,
+    'jsapi_ticket=' + ticket,
+    'timestamp=' + timestamp,
+    'url=' + url
+  ]
+  // 字典排序
+  var str = params.sort().join('&')
+  // sha1 hash
+  var shasum = crypto.createHash('sha1')
+  shasum.update(str)
+  retrun shasum.digest('hex')
+
+}
+
+// 签名算法
+function sign(ticket, url) {
+  var noncestr = createNonce()
+  var timestamp = createTimestamp()
+  var signature = _sign(noncestr, ticket, timestamp, url)
+
+  return {
+    noncestr: noncestr,
+    timestamp: timestamp,
+    signature: signature
+  }
+}
+
 app.use(function *(next) {
   if (this.url.indexOf('/movie') > -1) {
+    var wechatApi = new Wechat(config.wechat)
     this.body = ejs.render(tpl, {})
     return next
   }
-  else if (this.url.indexOf('/getImage') > -1) {
-    var source = fs.readFileSync('6.mp4')
-    this.body = source
-    return next
-  }
+  // else if (this.url.indexOf('/getImage') > -1) {
+  //   var source = fs.readFileSync('6.mp4')
+  //   this.body = source
+  //   return next
+  // }
   yield next
 })
 
