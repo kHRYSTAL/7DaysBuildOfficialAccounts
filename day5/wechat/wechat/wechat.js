@@ -107,6 +107,9 @@ function Wechat(opts) {
   this.appSecret = opts.appSecret
   this.getAccessToken = opts.getAccessToken
   this.saveAccessToken = opts.saveAccessToken
+  this.getTicket = opts.getTicket
+  this.saveTicket = opts.saveTicket
+
   this.fetchAccessToken()
 }
 
@@ -182,7 +185,7 @@ Wechat.prototype.isValidAccessToken = function(data) {
   var expires_in = data.expires_in
   var now = (new Date().getTime())
 
-  if (ticket && now < expires_in) {
+  if (now < expires_in) {
     return true
   }
   else {
@@ -199,7 +202,7 @@ Wechat.prototype.isValidTicket = function(data) {
   var expires_in = data.expires_in
   var now = (new Date().getTime())
 
-  if (now < expires_in) {
+  if (ticket && now < expires_in) {
     return true
   }
   else {
@@ -231,7 +234,6 @@ Wechat.prototype.updateAccessToken = function() {
 
 Wechat.prototype.updateTicket = function(access_token) {
   var url = api.ticket.get + '&access_token=' + access_token + '&type=jsapi'
-    + appSecret
 
   return new Promise(function(resolve, reject) {
     request({url: url, json: true}).then(function (response) {
