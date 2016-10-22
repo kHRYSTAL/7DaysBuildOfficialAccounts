@@ -36,13 +36,13 @@ var tpl = heredoc(function() {/*
       <div id="doctor"></div>
       <!-- 年份 -->
       <div id="year"></div>
-      <!-- 发布者 -->
+      <!-- 海报 -->
       <div id="poster"></div>
       <script src="http://zeptojs.com/zepto-docs.min.js"></script>
       <script src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
       <script>
         wx.config({
-          debug: true, //开启调试模式，调用的所有api的返回值会在客户端alert出来
+          debug: false, //开启调试模式，调用的所有api的返回值会在客户端alert出来
                         //若要查看传入的参数，可以在pc端打开，参数信息会通过log打出
                         // 仅在pc端时才会打印
           appId: 'wx90888cad1a5958f0',   // 必填 公众号唯一标识
@@ -56,6 +56,54 @@ var tpl = heredoc(function() {/*
             'translateVoice'
           ] //必填，需要使用的js接口列表，所有的js接口列表见附录2
         })
+        wx.ready(function() {
+          wx.checkJsApi({
+            jsApiList: ['onVoiceRecordEnd'],
+            //需要检测的js接口列表，所有js接口列表见附录2，
+            success: function(res) {
+              console.log(res)
+              // 以键值对的形式返回，可用的api值true，不可用为false
+              // 如：{'checkResult': {'chooseImage': true},'errMsg': 'checkJsApi:ok'}
+          }
+        })
+        // config信息验证后会执行ready方法，所有接口调用都必须在config接口
+        // 获得结果之后，config是一个客户端的异步操作，所以如果需要在页面加载时就调用
+        // 相关接口，则需要吧相关接口放在ready函数中调用来确保正确执行。对于用户触发
+        // 时才调用的接口，则可以直接调用，不需要放在ready函数中
+
+
+        var isRecording = false
+
+        $('h1').on('tap', function() {
+          if(!isRecording) {
+            isRecording = true
+            wx.startRecord({
+              cancel: function() {
+                window.alert('那就不能搜了哦')
+              }
+            })
+            return
+          }
+
+          isRecording = false
+          wx.stopRecord({
+            success: fuction(res) {
+              var localId = res.localId
+
+              wx.translateVoice({
+                localId: '', //需要识别音频的本地id，由录音相关接口获得
+                isShowProgressTips: 1, //默认为1，显示进度提示
+                success: function(res) {
+                  console.log(res.translateResult) //语音识别的结果
+                }
+              })
+            }
+          })
+        })
+
+      })
+
+
       </script>
     </body>
   </html>
